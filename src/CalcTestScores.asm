@@ -14,9 +14,10 @@
 
 
 ; MAIN ROUTINE DATA
-END_PROMPT 	.STRINGZ "Would you like to end the program?"
-CLEAR_PROMPT	.STRINGZ "Clear all previously entered scores?"
-NEWLINE		.STRINGZ "\n"
+PROMPT_WELCOME	.STRINGZ "Welcome to the Test Score Calculator!"
+PROMPT_END 	.STRINGZ "Would you like to end the program?"
+PROMPT_CLEAR	.STRINGZ "Clear all previously entered scores?"
+NEWLINE		.FILL xA
 GRADE_LETTERS	.STRINGZ "A"
 		.STRINGZ "B"
 		.STRINGZ "C"
@@ -60,18 +61,18 @@ LD R2, DEC100		; we will skip printing the 100s and 10s place if they are 0
 ADD R1, R0, x0		; copy R0 to register to be used as divisor
 JSR DIV
 ADD R1, R3, x0
-BRz PRINTTENS
+BRz PRINTTENS		; skip printing this if result is 0
 JSR TOASCII		; print hundreds place
 ADD R0, R3, x0
 OUT			; put character to console
 PRINTTENS
 LD R2, DEC100
 LD R1, PR0
-JSR MOD			; we do this in case there was a hundreds place
+JSR MOD			; R3 = parameter % 100
 ADD R1, R3, x0		; copy result of modulo to first parameter
 JSR DIV
 ADD R1, R3, x0
-BRz PRINTONES
+BRz PRINTONES		; skip to printing 1s place if this is 0
 JSR TOASCII		; print tens place
 ADD R0, R3, x0
 OUT			; put character to console
@@ -79,7 +80,7 @@ PRINTONES
 LD R1, PR0		; get original value
 AND R2, R2, x0
 ADD R2, R2, #10
-JSR MOD			; we do mod 10 to isolate 1s place
+JSR MOD			; R3 = parameter % 10
 ADD R1, R3, x0		; copy result to R1
 JSR TOASCII
 ADD R0, R3, x0		; R3 should now have ASCII value of value in ones
