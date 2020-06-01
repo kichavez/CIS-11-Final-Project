@@ -2,7 +2,7 @@
 ; A Team Last Minute program
 ; Authors: Kevin Chavez, Julissa Mota, Jasmine Gaona, Brian Cabrera
 ; Description: An LC-3 program that displays the minimum, maximum, and
-; 	       average grade of 5 test scores and displays the letter
+;	       average grade of 5 test scores and displays the letter
 ;	       grade associated with the test scores
 ; Input: User is prompted to input the test scores via keyboard
 ; Output: Displays maximum, minimum, average score and letter grade
@@ -11,7 +11,9 @@
 
 ; MAIN ROUTINE
 .ORIG x3000
-
+LEA R0, PROMPT_WELCOME
+PUTS
+HALT
 
 ; MAIN ROUTINE DATA
 PROMPT_WELCOME	.STRINGZ "Welcome to the Test Score Calculator!"
@@ -33,7 +35,7 @@ SCOREARRAY	.BLKW 5
 
 ; ASCII subroutines
 
-TOASCII	; convert value in R1 to ASCII and store in R3
+TOASCII			; convert value in R1 to ASCII and store in R3
 ST R2, ASCIISAVEREG
 LD R2, ASCIIOFFSET
 ADD R1, R1, R2
@@ -41,7 +43,7 @@ LD R2, ASCIISAVEREG
 RET
 ASCIISAVEREG .FILL x0
 
-FROMASCII ; convert ASCII in R1 to integer and store in R3
+FROMASCII 		; convert ASCII in R1 to integer and store in R3
 ST R2, ASCIISAVEREG
 LD R2, NASCIIOFFSET
 ADD R3, R1, R2
