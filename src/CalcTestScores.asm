@@ -13,10 +13,36 @@
 .ORIG x3000
 LEA R0, PROMPT_WELCOME
 PUTS
+LD R0, NEWLINE
+OUT
+START			; where we reset the program if the user chooses
+JSR CLEARSTACK
+LEA R0, PROMPT_5SCORES
+PUTS
+LD R0, NEWLINE
+OUT
+AND R6, R6, x0		; we will use this to keep track of how many scores are accepted
+LOOP_SCORES
+LEA R0, ENTERPLS
+PUTS
+GETC
+ADD R1, R0, x0		; copy keyboard input to parameter
+JSR FROMASCII
+LD R2, NASCII0
+ADD R1, R2, R3		; check if the character is below ASCII 0
+BRn NOTASCIINUM
+LD R2, NASCII9
+ADD R1, R2, R3
+BRp NOTASCIINUM		; check if character is above ASCII 9
+
 HALT
 
 ; MAIN ROUTINE DATA
 PROMPT_WELCOME	.STRINGZ "Welcome to the Test Score Calculator!"
+PROMPT_HITENTER	.STRINGZ "Press the enter button when you are finished typing a score."
+PROMPT_CANCEL	.STRINGZ "Or 
+PROMPT_5SCORES	.STRINGZ "Please enter 5 test scores."
+PROMPT_ENTERPLS	.STRINGZ "Type in the next test score: "
 PROMPT_END 	.STRINGZ "Would you like to end the program?"
 PROMPT_CLEAR	.STRINGZ "Clear all previously entered scores?"
 NEWLINE		.FILL xA
@@ -26,6 +52,9 @@ GRADE_LETTERS	.STRINGZ "A"
 		.STRINGZ "D"
 		.STRINGZ "F"
 SCOREARRAY	.BLKW 5
+NASCII0		.FILL #-48	; we use these to check if keys are 0-9
+NASCII9		.FILL #-57
+
 
 ; ---------------------------------------------------------------------------------------------
 
