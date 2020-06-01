@@ -224,9 +224,9 @@ DSAV1 .FILL x0
 DSAV2 .FILL x0
 
 MOD			; stores R1 % R2 in R3, stores -1 if error occurred
-ST R1, MSAV1
-ST R2, MSAV2
-ST R7, MSAV7		; save registers
+ST R1, MODSAV1
+ST R2, MODSAV2
+ST R7, MODSAV7		; save registers
 JSR DIV
 ADD R1, R3, x0
 BRn ENDMOD		; error ocurred when dividing
@@ -238,10 +238,11 @@ NOT R3, R3
 ADD R3, R3, x1		; 2's complement
 ADD R3, R3, R1		; R3 should now have remainder
 ENDMOD
-LD R1, MSAV1
-LD R2, MSAV2
+LD R1, MODSAV1
+LD R2, MODSAV2
+LD R7, MODSAV7		; restore registers
 RET
-MSAV1	.FILL x0
-MSAV2	.FILL x0
-MSAV7	.FILL x0
+MODSAV1	.FILL x0
+MODSAV2	.FILL x0
+MODSAV7	.FILL x0
 .END
