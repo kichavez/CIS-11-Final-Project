@@ -12,6 +12,7 @@
 ; MAIN ROUTINE
 .ORIG x3000
 
+
 ; MAIN ROUTINE DATA
 END_PROMPT 	.STRINGZ "Would you like to end the program?"
 CLEAR_PROMPT	.STRINGZ "Clear all previously entered scores?"
@@ -64,16 +65,25 @@ JSR TOASCII		; print hundreds place
 ADD R0, R3, x0
 OUT			; put character to console
 PRINTTENS
-AND R2, R2, x0
-ADD R2, R2, #10
+LD R2, DEC100
 LD R1, PR0
+JSR MOD			; we do this in case there was a hundreds place
+ADD R1, R3, x0		; copy result of modulo to first parameter
 JSR DIV
 ADD R1, R3, x0
+BRz PRINTONES
 JSR TOASCII		; print tens place
 ADD R0, R3, x0
 OUT			; put character to console
-BRz PRINTONES
-; TODO: FINISH THIS AFTER IMPLEMENTING MODULO
+PRINTONES
+LD R1, PR0		; get original value
+AND R2, R2, x0
+ADD R2, R2, #10
+JSR MOD			; we do mod 10 to isolate 1s place
+ADD R1, R3, x0		; copy result to R1
+JSR TOASCII
+ADD R0, R3, x0		; R3 should now have ASCII value of value in ones
+OUT			; output character to console
 LD R0, PR0
 LD R1, PR1
 LD R2, PR2
