@@ -125,12 +125,16 @@ ADD R4, R4, x0
 BRnz STCK2ERR		; total was empty or (somehow?) negative
 LD R1, ARRAYSIZE	; array size doubles as an offset
 LD R2, SCOREARRAY	; R2 now points to SCOREARRAY
+<<<<<<< HEAD
 ADD R2, R2, #-1		; we offset the array address by 1 since the loop will always add at least 1
 PTRLOOP
 ADD R2, R2, x1		; increase offset from array
 ADD R1, R1, #-1		; decrease counter
 BRzp PTRLOOP		; back to top of loop if counter >= 0
 STI R2, R4		; store total to where pointer's new location
+=======
+LDR R2, 
+>>>>>>> parent of d844c7c... Update CalcTestScores.asm
 LD R1, ARRAYSIZE
 ADD R1, R1, x1		; increase array size by 1 and save
 ST R1, ARRAYSIZE
