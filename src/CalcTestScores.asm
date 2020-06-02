@@ -46,8 +46,6 @@ GRADE_LETTERS	.STRINGZ "A"
 		.STRINGZ "F"
 SCOREARRAY	.BLKW 5
 ARRAYSIZE	.FILL x0
-NASCII0		.FILL #-48	; we use these to check if keys are 0-9
-NASCII9		.FILL #-57
 
 ; ---------------------------------------------------------------------------------------------
 
@@ -145,7 +143,12 @@ TONUMR1	.FILL x0
 TONUMR2	.FILL x0
 TONUMR4	.FILL x0
 TONUMR5	.FILL x0
-NEG100	.FILL #-100
+
+
+; main subroutine data
+NASCII0		.FILL #-48	; we use these to check if keys are 0-9
+NASCII9		.FILL #-57
+NEG100		.FILL #-100
 
 ; ---------------------------------------------------------------------------------------------
 
