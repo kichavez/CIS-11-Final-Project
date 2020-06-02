@@ -23,7 +23,7 @@ LD R0, NEWLINE
 OUT
 AND R6, R6, x0		; we will use this to keep track of how many scores are accepted
 LOOP_SCORES
-LEA R0, ENTERPLS
+LEA R0, PROMPT_ENTERPLS
 PUTS
 JSR KBNUMIN
 
@@ -32,7 +32,6 @@ HALT
 ; MAIN ROUTINE DATA
 PROMPT_WELCOME	.STRINGZ "Welcome to the Test Score Calculator!"
 PROMPT_HITENTER	.STRINGZ "Press the enter button when you are finished typing a score."
-PROMPT_CANCEL	.STRINGZ "Or 
 PROMPT_5SCORES	.STRINGZ "Please enter 5 test scores."
 PROMPT_ENTERPLS	.STRINGZ "Type in the next test score: "
 PROMPT_END 	.STRINGZ "Would you like to end the program?"
@@ -95,13 +94,27 @@ MAINR2	.FILL x0
 MAINR4	.FILL x0
 
 STACK2NUM		; turns values in the stack into integer and adds to input array
-
+ST R0, TONUMR0		; put 1 into R3 if successful, -1 otherwise
+ST R1, TONUMR1
+ST R2, TONUMR2
+ST R4, TONUMR4
+ST R5, TONUMR5		; save registers
+AND R0, R0, x0
+ADD R0, R0, x1		; R0 = 100
+AND R1, R1, x0		; we will store the total from parsing here
+LD R0, TONUMR0
+LD R1, TONUMR1
+LD R2, TONUMR2
+LD R4, TONUMR4
+LD R5, TONUMR5		; restore registers
 RET
 TONUMR0	.FILL x0
 TONUMR1	.FILL x0
 TONUMR2	.FILL x0
-TONUMR3	.FILL x0
 TONUMR4	.FILL x0
+TONUMR5	.FILL x0
+
+; ---------------------------------------------------------------------------------------------
 
 ; ASCII subroutines
 
