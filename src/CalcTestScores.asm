@@ -148,7 +148,7 @@ TONUMR5	.FILL x0
 ; main subroutine data
 NASCII0		.FILL #-48	; we use these to check if keys are 0-9
 NASCII9		.FILL #-57
-NEG100		.FILL #-100
+NEG100		.FILL #-100	; 100 is the max score
 
 ; ---------------------------------------------------------------------------------------------
 
