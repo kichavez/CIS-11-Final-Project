@@ -43,6 +43,7 @@ GRADE_LETTERS	.STRINGZ "A"
 		.STRINGZ "D"
 		.STRINGZ "F"
 SCOREARRAY	.BLKW 5
+ARRAYSIZE	.FILL x3100	; we will keep count of the array here
 NASCII0		.FILL #-48	; we use these to check if keys are 0-9
 NASCII9		.FILL #-57
 
@@ -81,7 +82,7 @@ NOT R2, R2
 ADD R2, R2, x1		; R2 = -0xA, ASCII value of newline
 ADD R1, R2, R3		; check if user entered a newline (i.e. pushed enter)
 BRz ENDKBIN
-BR KB_LOOP		; User entered a character that's not newline or enter, so do nothing
+BR KB_LOOP		; User entered a character not newline or enter, so do nothing
 ENDKBIN
 LD R1, MAINR1
 LD R2, MAINR2
@@ -99,20 +100,44 @@ ST R1, TONUMR1
 ST R2, TONUMR2
 ST R4, TONUMR4
 ST R5, TONUMR5		; save registers
-AND R0, R0, x0
-ADD R0, R0, x1		; R0 = 100
-AND R1, R1, x0		; we will store the total from parsing here
+LD R5, NEG100		; we will be using this multiple times
+AND R2, R2, x0
+ADD R2, R2, x1		; R2 = 1
+AND R4, R4, x0		; we will store the total from parsing here
+POPPIN_LOOP
+JSR POP
+ADD R3, R3, x0
+BRn STACKEMPT		; stack empty, so break out from loop
+ADD R1, R3, x0		; copy R3 to R1 to be multiplied
+JSR MULT
+ADD R4, R3, R4		; add result to total
+ADD R1, R4, R5		; check if R4 < 100
+BRp STCK2ERR
+AND R1, R1, x0
+ADD R1, R1, #10
+JSR MULT		; we move up by a factor of 10, the first number is in the 1's place
+ADD R2, R3, x0		; copy result to R2 for next loop iteration
+BR POPPIN_LOOP
+STACKEMPT
+ADD R4, R4, x0
+BRnz STCK2ERR		; total was empty or (somehow?) negative
+S2NFIN
 LD R0, TONUMR0
 LD R1, TONUMR1
 LD R2, TONUMR2
 LD R4, TONUMR4
 LD R5, TONUMR5		; restore registers
 RET
+STCK2ERR
+AND R3, R3, x0		; stack was empty
+ADD R3, R3, #-1		; or value was going to be larger than 100
+BR S2NFIN		; return without adding to the array
 TONUMR0	.FILL x0
 TONUMR1	.FILL x0
 TONUMR2	.FILL x0
 TONUMR4	.FILL x0
 TONUMR5	.FILL x0
+NEG100	.FILL #-100
 
 ; ---------------------------------------------------------------------------------------------
 
