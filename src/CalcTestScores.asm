@@ -125,15 +125,10 @@ ADD R4, R4, x0
 BRnz STCK2ERR		; total was empty or (somehow?) negative
 LD R1, ARRAYSIZE	; array size doubles as an offset
 LD R2, SCOREARRAY	; R2 now holds address of SCOREARRAY
-ADD R2, R2, #-1		; we offset the array address by 1 since the loop will always add at least 1
-PTRLOOP
-ADD R2, R2, x1		; increase offset from array
-ADD R1, R1, #-1		; decrease counter
-BRzp PTRLOOP		; back to top of loop if counter >= 0
-STR R4, R2, x0		; store total to R2's new location
+STR R4, R2, R1		; store total to address of SCOREARRAY + R1
 LD R1, ARRAYSIZE
-ADD R1, R1, x1		; increase array size by 1 and save
-ST R1, ARRAYSIZE
+ADD R1, R1, x1		; increase array size by 1
+ST R1, ARRAYSIZE	; save new array size
 S2NFIN
 LD R0, TONUMR0
 LD R1, TONUMR1
