@@ -16,6 +16,8 @@ PUTS
 LD R0, NEWLINE
 OUT
 START			; where we reset the program if the user chooses
+AND R0, R0, x0		; clear R0 to reset array size
+ST R0, ARRAYSIZE
 JSR CLEARSTACK
 LEA R0, PROMPT_5SCORES
 PUTS
@@ -43,7 +45,7 @@ GRADE_LETTERS	.STRINGZ "A"
 		.STRINGZ "D"
 		.STRINGZ "F"
 SCOREARRAY	.BLKW 5
-ARRAYSIZE	.FILL x3100	; we will keep count of the array here
+ARRAYSIZE	.FILL x0
 NASCII0		.FILL #-48	; we use these to check if keys are 0-9
 NASCII9		.FILL #-57
 
@@ -121,6 +123,17 @@ BR POPPIN_LOOP
 STACKEMPT
 ADD R4, R4, x0
 BRnz STCK2ERR		; total was empty or (somehow?) negative
+LD R1, ARRAYSIZE	; array size doubles as an offset
+LD R2, SCOREARRAY	; R2 now has the address of the SCOREARRAY
+ADD R2, R2, #-1		; we offset the array address by 1 since the loop will always add at least 1
+PTRLOOP
+ADD R2, R2, x1		; increase offset from array
+ADD R1, R1, #-1		; decrease counter
+BRzp PTRLOOP		; back to top of loop if counter >= 0
+STI R2, R4		; store total into resultant array slot
+LD R1, ARRAYSIZE
+ADD R1, R1, x1		; increase array size by 1 and save
+ST R1, ARRAYSIZE
 S2NFIN
 LD R0, TONUMR0
 LD R1, TONUMR1
