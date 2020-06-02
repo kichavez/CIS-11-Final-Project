@@ -124,18 +124,8 @@ STACKEMPT
 ADD R4, R4, x0
 BRnz STCK2ERR		; total was empty or (somehow?) negative
 LD R1, ARRAYSIZE	; array size doubles as an offset
-<<<<<<< HEAD
 LD R2, SCOREARRAY	; R2 now points to SCOREARRAY
 LDR R2, 
-=======
-LD R2, SCOREARRAY	; R2 now has the address of the SCOREARRAY
-ADD R2, R2, #-1		; we offset the array address by 1 since the loop will always add at least 1
-PTRLOOP
-ADD R2, R2, x1		; increase offset from array
-ADD R1, R1, #-1		; decrease counter
-BRzp PTRLOOP		; back to top of loop if counter >= 0
-STI R2, R4		; store total into resultant array slot
->>>>>>> parent of 962a912... Update CalcTestScores.asm
 LD R1, ARRAYSIZE
 ADD R1, R1, x1		; increase array size by 1 and save
 ST R1, ARRAYSIZE
