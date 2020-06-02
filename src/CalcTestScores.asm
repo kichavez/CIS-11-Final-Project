@@ -25,15 +25,7 @@ AND R6, R6, x0		; we will use this to keep track of how many scores are accepted
 LOOP_SCORES
 LEA R0, ENTERPLS
 PUTS
-GETC
-ADD R1, R0, x0		; copy keyboard input to parameter
-JSR FROMASCII
-LD R2, NASCII0
-ADD R1, R2, R3		; check if the character is below ASCII 0
-BRn NOTASCIINUM
-LD R2, NASCII9
-ADD R1, R2, R3
-BRp NOTASCIINUM		; check if character is above ASCII 9
+JSR KBNUMIN
 
 HALT
 
@@ -55,12 +47,61 @@ SCOREARRAY	.BLKW 5
 NASCII0		.FILL #-48	; we use these to check if keys are 0-9
 NASCII9		.FILL #-57
 
-
 ; ---------------------------------------------------------------------------------------------
 
 ; Below, you will find various related subroutines and labels grouped
 
 ; ---------------------------------------------------------------------------------------------
+
+; main program subroutines
+
+KBNUMIN			; processes KB input and pushes total value to stack
+ST R7, MAINR7
+ST R1, MAINR1
+ST R2, MAINR2
+ST R4, MAINR4
+KB_LOOP
+GETC
+ADD R1, R0, x0		; copy keyboard input to parameter
+JSR FROMASCII
+LD R2, NASCII0
+ADD R1, R2, R3		; check if the character is below ASCII 0
+BRn NOTASCIINUM
+LD R2, NASCII9
+ADD R1, R2, R3
+BRp NOTASCIINUM		; check if character is above ASCII 9
+OUT			; Mirror the character back to the console
+ADD R0, R3, x0		; copy R3 to R0 to be pushed
+JSR PUSH
+ADD R3, R3, x0
+BRz ENDKBIN		; return if there was an error pushing to the stack
+BR KB_LOOP		; process next character
+NOTASCIINUM
+LD R2, 0xA
+NOT R2, R2
+ADD R2, R2, x1		; R2 = -0xA, ASCII value of newline
+ADD R1, R2, R3		; check if user entered a newline (i.e. pushed enter)
+BRz ENDKBIN
+BR KB_LOOP		; User entered a character that's not newline or enter, so do nothing
+ENDKBIN
+LD R1, MAINR1
+LD R2, MAINR2
+LD R4, MAINR4
+LD R7, MAINR7
+RET
+MAINR7	.FILL x0
+MAINR1	.FILL X0
+MAINR2	.FILL x0
+MAINR4	.FILL x0
+
+STACK2NUM		; turns values in the stack into integer and adds to input array
+
+RET
+TONUMR0	.FILL x0
+TONUMR1	.FILL x0
+TONUMR2	.FILL x0
+TONUMR3	.FILL x0
+TONUMR4	.FILL x0
 
 ; ASCII subroutines
 
@@ -143,6 +184,7 @@ DEC100		.FILL #100
 ; ---------------------------------------------------------------------------------------------
 
 ; STACK OPERATIONS
+
 CLEARSTACK		; set stack size to 0
 ST R0, CLRSAVREG	; save R0
 LD R0, STACK_BEGIN
@@ -151,7 +193,7 @@ LD R0, CLRSAVREG	; restore R0
 RET
 CLRSAVREG .FILL x0
 
-PUSH			; push R0 to top of stack, set R3 to 1 if successful and 0 otherwise
+PUSH			; push R0 to top of stack, set R3 to 1 if successful and -1 otherwise
 ST R1, PSHR1
 ST R2, PSHR2		; save registers we'll be using
 LD R1, STACK_END
@@ -168,6 +210,7 @@ ADD R3, R3, x1		; set R3 to 1 to indicate successful push
 BR ENDPUSH		; finish function
 NOPUSH
 AND R3, R3, x0
+ADD R3, R3, #-1
 ENDPUSH			
 LD R1, PSHR1
 LD R2, PSHR2		; restore registers
@@ -175,16 +218,20 @@ RET
 PSHR1 .FILL x0
 PSHR2 .FILL x0
 
-POP			; set R3 to top of stack and pop, do nothing if stack empty
+POP			; set R3 to top of stack and pop, set to -1 if empty
 ST R1, POPR1
 ST R2, POPR2		; save registers we'll be using
 LD R1, STACK_END
 LD R2, SP
 LD R1, STACK_BEGIN_N
 ADD R1, R2, R1
-BRn ENDPOP 		; stack underflow
+BRn EMPTY		; stack underflow
 LDR R3, R2, x0		; get top of stack
 ADD R2, R2, #-1		; pop
+BR ENDPOP
+EMPTY
+AND R3, R3, x0
+ADD R3, R3, #-1		; Tried to pop empty stack, return -1
 ENDPOP
 LD R1, POPR1
 LD R2, POPR2		; restore registers
