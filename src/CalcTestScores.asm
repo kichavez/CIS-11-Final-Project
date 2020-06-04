@@ -23,11 +23,13 @@ LEA R0, PROMPT_5SCORES
 PUTS
 LD R0, NEWLINE
 OUT
-AND R6, R6, x0		; we will use this to keep track of how many scores are accepted
 LOOP_SCORES
 LEA R0, PROMPT_ENTERPLS
 PUTS
 JSR KBNUMIN
+LD R0, ARRAYSIZE
+ADD R0, R0, #-5		; check if 5 scores were entered
+BRn LOOP_SCORES		; back to top if array size < 5
 
 HALT
 
@@ -122,7 +124,7 @@ STACKEMPT
 ADD R4, R4, x0
 BRnz STCK2ERR		; total was empty or (somehow?) negative
 LD R1, ARRAYSIZE	; array size doubles as an offset
-LD R2, SCOREARRAY	; R2 now holds address of SCOREARRAY
+LEA R2, SCOREARRAY	; R2 now holds address of SCOREARRAY
 STR R4, R2, R1		; store total to address of SCOREARRAY + R1
 LD R1, ARRAYSIZE
 ADD R1, R1, x1		; increase array size by 1
@@ -138,17 +140,123 @@ STCK2ERR
 AND R3, R3, x0		; stack was empty
 ADD R3, R3, #-1		; or value was going to be larger than 100
 BR S2NFIN		; return without adding to the array
+; STACK2NUM subroutine data
 TONUMR0	.FILL x0
 TONUMR1	.FILL x0
 TONUMR2	.FILL x0
 TONUMR4	.FILL x0
 TONUMR5	.FILL x0
-
-
-; main subroutine data
 NASCII0		.FILL #-48	; we use these to check if keys are 0-9
 NASCII9		.FILL #-57
 NEG100		.FILL #-100	; 100 is the max score
+
+PRINTAVG
+ST R0, AVGR0
+ST R1, AVGR1
+ST R2, AVGR2
+ST R3, AVGR3
+ST R4, AVGR4
+ST R7, AVGR7		; save registers
+AND R4, R4, x0		; we will keep track of the loop iteration in R4
+AND R0, R0, x0		; we will store our total here
+LEA R2, SCOREARRAY	; put the address of the score array in R2
+AVERAGE_LOOP
+LDR R1, R2, R4		; put nth element of array into R1
+ADD R0, R1, R0		; add to total
+ADD R4, R4, x1		; increment counter
+ADD R3, R4, #-5		; loop condition check
+BRn AVERAGE_LOOP	; back to top of loop if we've looped < 5 times
+ADD R1, R0, x0
+AND R2, R2, x0
+ADD R2, R2, x5		; load parameters for division subroutine
+JSR DIV			; get mean by dividing total by 5
+ADD R3, R3, x0		; copy result to R0
+JSR PRINTNUM		; print R0 to console
+LD R0, AVGR0
+LD R1, AVGR1
+LD R2, AVGR2
+LD R3, AVGR3
+LD R4, AVGR4
+LD R7, AVGR7		; restore registers
+RET
+AVGR0	.FILL x0
+AVGR1	.FILL x0
+AVGR2	.FILL x0
+AVGR3	.FILL x0
+AVGR4	.FILL x0
+AVGR7	.FILL x0
+
+PRINTMAX
+ST R1, MAXR1
+ST R2, MAXR2
+ST R3, MAXR3
+ST R4, MAXR4
+ST R5, MAXR5
+ST R7, MAXR7		; save registers
+AND R4, R4, x0		; loop counter
+AND R0, R0, x0		; we will store the maximum found here
+LEA R1, SCOREARRAY	; load address of score array into R1
+MAX_LOOP
+LDR R2, R1, R4		; load SCOREARRAY[R4] into R2
+NOT R2, R3
+ADD R3, R3, x1		; R3 = -R2
+ADD R3, R3, R0		; compare R3 to R0
+BRzp MAXLCHECK		; current loop value is smaller or equal if R3 isn't negative
+ADD R0, R2, x0		; update to new maximum
+MAXLCHECK
+ADD R4, R4, x1		; increment counter
+ADD R3, R4, #-5		; continue looping if counter < 5
+BRn MAX_LOOP
+JSR PRINTNUM		; print R0
+LD R1, MAXR1
+LD R2, MAXR2
+LD R3, MAXR3
+LD R4, MAXR4
+LD R5, MAXR5
+LD R7, MAXR7		; restore registers
+RET
+MAXR1 .FILL x0
+MAXR2 .FILL x0
+MAXR3 .FILL x0
+MAXR4 .FILL x0
+MAXR5 .FILL x0
+MAXR7 .FILL x0
+
+PRINTMIN
+ST R1, MINR1
+ST R2, MINR2
+ST R3, MINR3
+ST R4, MINR4
+ST R5, MINR5
+ST R7, MINR7		; save registers
+AND R4, R4, x0		; loop counter
+AND R0, R0, x0		; we will store the minimum found here
+LEA R1, SCOREARRAY	; load address of score array into R1
+MIN_LOOP
+LDR R2, R1, R4		; load SCOREARRAY[R4] into R2
+NOT R2, R3
+ADD R3, R3, x1		; R3 = -R2
+ADD R3, R3, R0		; compare R3 to R0
+BRn MINLCHECK		; current loop value is smaller or equal if R3 isn't negative
+ADD R0, R2, x0		; update to new minimum
+MINLCHECK
+ADD R4, R4, x1		; increment counter
+ADD R3, R4, #-5		; continue looping if counter < 5
+BRn MIN_LOOP
+JSR PRINTNUM		; print R0
+LD R1, MINR1
+LD R2, MINR2
+LD R3, MINR3
+LD R4, MINR4
+LD R5, MINR5
+LD R7, MINR7		; restore registers
+RET
+MINR1 .FILL x0
+MINR2 .FILL x0
+MINR3 .FILL x0
+MINR4 .FILL x0
+MINR5 .FILL x0
+MINR7 .FILL x0
 
 ; ---------------------------------------------------------------------------------------------
 
