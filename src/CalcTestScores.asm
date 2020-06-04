@@ -75,6 +75,11 @@ PUTS
 JSR PRINTAVG
 LD R0, NEWLINE
 OUT
+LEA R0, PROMPT_DISPGRDS	; convert scores to letter grades
+PUTS
+JSR DISPLAYGRADES
+LD R0, NEWLINE
+OUT
 LEA PROMPT_END		; ask user whether to end the program
 PUTS
 LD R0, NEWLINE
@@ -96,6 +101,7 @@ PROMPT_CLEAR	.STRINGZ "Clear all previously entered scores? (Y/N)"
 PROMPT_DISPMAX	.STRINGZ "Highest score: "
 PROMPT_DISPMIN	.STRINGZ "Lowest score: "
 PROMPT_DISPAVG	.STRINGZ "Average score: "
+PROMPT_DISGRDS	.STRINGZ "Letter grades:"
 NEWLINE		.FILL xA
 SCOREARRAY	.BLKW 5
 ARRAYSIZE	.FILL x0
