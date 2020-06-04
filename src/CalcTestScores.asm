@@ -28,6 +28,7 @@ LEA R0, PROMPT_ENTERPLS
 PUTS
 JSR KBNUMIN
 LD R0, ARRAYSIZE
+JSR STACK2NUM		; try to add the input to the stack
 ADD R0, R0, #-5		; check if 5 scores were entered
 BRn LOOP_SCORES		; back to top if array size < 5
 
@@ -36,10 +37,14 @@ HALT
 ; MAIN ROUTINE DATA
 PROMPT_WELCOME	.STRINGZ "Welcome to the Test Score Calculator!"
 PROMPT_HITENTER	.STRINGZ "Press the enter button when you are finished typing a score."
-PROMPT_5SCORES	.STRINGZ "Please enter 5 test scores."
+PROMPT_5SCORES	.STRINGZ "Please enter 5 test scores (0-100)."
 PROMPT_ENTERPLS	.STRINGZ "Type in the next test score: "
 PROMPT_END 	.STRINGZ "Would you like to end the program?"
+PROMPT_ERR_IN	.STRINGZ "There was an error processing your input. Try again"
 PROMPT_CLEAR	.STRINGZ "Clear all previously entered scores?"
+PROMPT_DISPMAX	.STRINGZ "Highest score: "
+PROMPT_DISPMIN	.STRINGZ "Lowest score: "
+PROMPT_DISPAVG	.STRINGZ "Average score: "
 NEWLINE		.FILL xA
 GRADE_LETTERS	.STRINGZ "A"
 		.STRINGZ "B"
@@ -58,10 +63,11 @@ ARRAYSIZE	.FILL x0
 ; main program subroutines
 
 KBNUMIN			; processes KB input and pushes total value to stack
-ST R7, MAINR7
+ST R7, MAINR7		; set R3 to 1 if at least 1 value is on the stack, -1 otherwise
 ST R1, MAINR1
 ST R2, MAINR2
 ST R4, MAINR4
+AND R4, R4, x0		; we use this to check if the user entered no values
 KB_LOOP
 GETC
 ADD R1, R0, x0		; copy keyboard input to parameter
@@ -77,6 +83,7 @@ ADD R0, R3, x0		; copy R3 to R0 to be pushed
 JSR PUSH
 ADD R3, R3, x0
 BRz ENDKBIN		; return if there was an error pushing to the stack
+ADD R4, R4, x1		; add to R4 to signify at least 1 value is in the stack
 BR KB_LOOP		; process next character
 NOTASCIINUM
 LD R2, 0xA
@@ -86,6 +93,12 @@ ADD R1, R2, R3		; check if user entered a newline (i.e. pushed enter)
 BRz ENDKBIN
 BR KB_LOOP		; User entered a character not newline or enter, so do nothing
 ENDKBIN
+AND R3, R3, x0		; here we will set R3 to indicate whether there is a value on the stack
+ADD R3, R3, #-1
+ADD R4, R4, x0
+BRz ENDKBIN2		; if R4 is zero, then no characters were enterred
+ADD R3, R3, x2		; add 2 since R4 != 0, making R3 = 1
+ENDKBIN2
 LD R1, MAINR1
 LD R2, MAINR2
 LD R4, MAINR4
@@ -120,9 +133,10 @@ ADD R1, R1, #10
 JSR MULT		; we move up by a factor of 10, the first number is in the 1's place
 ADD R2, R3, x0		; copy result to R2 for next loop iteration
 BR POPPIN_LOOP
+
 STACKEMPT
 ADD R4, R4, x0
-BRnz STCK2ERR		; total was empty or (somehow?) negative
+BRnz STCK2ERR		; total was somehow negative
 LD R1, ARRAYSIZE	; array size doubles as an offset
 LEA R2, SCOREARRAY	; R2 now holds address of SCOREARRAY
 STR R4, R2, R1		; store total to address of SCOREARRAY + R1
