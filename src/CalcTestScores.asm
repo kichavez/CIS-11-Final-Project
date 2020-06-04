@@ -43,6 +43,7 @@ BRp ENDPROGRAM		; user entered yes, so end program
 LEA R0, PROMPT_CLEAR	; ask whether to clear previously entered scores
 PUTS
 LD R0, NEWLINE
+OUT
 JSR YESORNO
 ADD R3, R3, x0
 BRz LOOP_SCORES		; NO: keep all previously entered scores and continue loop
@@ -50,13 +51,38 @@ BRp START		; YES: clear all previously entered scores, so restart program
 CONT_SCORE_LOOP
 JSR STACK2NUM		; try to add the input to the stack
 ADD R3, R3, x0		; check if push was successful
-
+BRp LOOP_SCORES_CHK
+LEA R0, PROMPT_ERR_IN	; let user know there was an error parsing the input
+PUTS
+LD R0, NEWLINE
+OUT
+LOOP_SCORES_CHK
 LD R0, ARRAYSIZE
 ADD R0, R0, #-5		; check if 5 scores were entered
 BRn LOOP_SCORES		; back to top if array size < 5
-
-
-ENDPROGRAM HALT
+LEA R0, PROMPT_DISPMAX	; display highest entered score
+PUTS
+JSR PRINTMAX
+LD R0, NEWLINE
+OUT
+LEA R0, PROMPT_DISPMIN	; display lowest entered score
+PUTS
+JSR PRINTMIN
+LD R0, NEWLINE
+OUT
+LEA R0, PROMPT_DISPAVG	; display average of all entered scores
+PUTS
+JSR PRINTAVG
+LD R0, NEWLINE
+OUT
+LEA PROMPT_END		; ask user whether to end the program
+PUTS
+LD R0, NEWLINE
+OUT
+JSR YESORNO
+ADD R3, R3, x0
+BRz START		; user entered yes, so restart program
+ENDPROGRAM HALT		; halt program
 
 ; MAIN ROUTINE DATA
 PROMPT_WELCOME	.STRINGZ "Welcome to the Test Score Calculator!"
@@ -71,11 +97,6 @@ PROMPT_DISPMAX	.STRINGZ "Highest score: "
 PROMPT_DISPMIN	.STRINGZ "Lowest score: "
 PROMPT_DISPAVG	.STRINGZ "Average score: "
 NEWLINE		.FILL xA
-GRADE_LETTERS	.STRINGZ "A"
-		.STRINGZ "B"
-		.STRINGZ "C"
-		.STRINGZ "D"
-		.STRINGZ "F"
 SCOREARRAY	.BLKW 5
 ARRAYSIZE	.FILL x0
 
@@ -166,6 +187,8 @@ LEA R2, SCOREARRAY	; R2 now holds address of SCOREARRAY
 STR R4, R2, R1		; store total to address of SCOREARRAY + R1
 ADD R1, R1, x1		; increase array size by 1
 ST R1, ARRAYSIZE	; save new array size
+AND R3, R3, x0
+ADD R3, R3, x1		; R3 = 1, siginifying successful addition to array
 S2NFIN
 LD R0, TONUMR0
 LD R1, TONUMR1
@@ -294,6 +317,42 @@ MINR3 .FILL x0
 MINR4 .FILL x0
 MINR5 .FILL x0
 MINR7 .FILL x0
+
+DISPLAYGRADES		; display letter grade of each score in SCOREARRAY
+ST R0, DGR0
+ST R1, DGR1
+ST R2, DGR2
+ST R3, DGR3
+ST R4, DGR4
+ST R5, DGR5
+ST R7, DGR7		; save registers
+AND R4, R4, x0		; we will use R4 as our counter
+LEA R5, SCOREARRAY	; put the address of the scores array in R5
+AND R2, R2, x0
+ADD R2, R2, #10		; R2 = 10 for modulo operation
+DG_LOOP
+LDR R1, R5, R4		; load SCOREARRAY[R4] into R1
+JSR MOD
+LD R0, DGR0
+LD R1, DGR1
+LD R2, DGR2
+LD R3, DGR3
+LD R4, DGR4
+LD R5, DGR5
+LD R7, DGR7		; restore registers
+RET
+ASCIIA	.FILL x41
+ASCIIB	.FILL x42
+ASCIIC	.FILL x43
+ASCIID	.FILL x44
+ASCIIF	.FILL x46
+DGR0	.FILL x0
+DGR1	.FILL x0
+DGR2	.FILL x0
+DGR3	.FILL x0
+DGR4	.FILL x0
+DGR5	.FILL x0
+DGR7	.FILL x0
 
 ; ---------------------------------------------------------------------------------------------
 
