@@ -14,29 +14,23 @@ LEA R0, PROMPT_WELCOME
 PUTS
 JSR PRINTNEWLINE
 START			; where we reset the program if the user chooses
-AND R0, R0, x0		; clear R0 to reset array size
-ST R0, ARRAYSIZE
-JSR CLEARSTACK
-LEA R0, PROMPT_5SCORES
-PUTS
+JSR CLEARARRAY		; reset array
+JSR CLEARSTACK		; reset stack
+JSR PRNT_5SCORES	; ask user to input 5 scores
 JSR PRINTNEWLINE
 LOOP_SCORES
-LEA R0, PROMPT_ENTERPLS
-PUTS
+JSR PRNT_ENTERPLS	; generic prompt displayed every loop
 JSR KBNUMIN
 ADD R3, R3, x0		; check if the user left the input blank
 BRzp CONT_SCORE_LOOP
-LEA R0, PROMPT_NO_IN
-PUTS
+JSR PRNT_PROMPT_NO_IN	; let user know no input was detected (i.e. a blank line)
 JSR PRINTNEWLINE
-LEA R0, PROMPT_END	; ask whether to end program
-PUTS
+JSR PRNT_END		; ask whether to end program
 JSR PRINTNEWLINE
 JSR YESORNO
 ADD R3, R3, x0
 BRp ENDPROGRAM		; user entered yes, so end program
-LEA R0, PROMPT_CLEAR	; ask whether to clear previously entered scores
-PUTS
+JSR PRNT_CLEAR
 JSR PRINTNEWLINE
 JSR YESORNO
 ADD R3, R3, x0
@@ -46,31 +40,25 @@ CONT_SCORE_LOOP
 JSR STACK2NUM		; try to add the input to the stack
 ADD R3, R3, x0		; check if push was successful
 BRp LOOP_SCORES_CHK
-LEA R0, PROMPT_ERR_IN	; let user know there was an error parsing the input
-PUTS
+JSR PRNT_ERR_IN		; let user know there was an error parsing the input
 JSR PRINTNEWLINE
 LOOP_SCORES_CHK
-LD R0, ARRAYSIZE
-ADD R0, R0, #-5		; check if 5 scores were entered
+JSR GETARRAYSIZE
+ADD R3, R3, #-5		; check if 5 scores were entered
 BRn LOOP_SCORES		; back to top if array size < 5
-LEA R0, PROMPT_DISPMAX	; display highest entered score
-PUTS
+JSR PRNT_DISPMAX	; display highest entered score
 JSR PRINTMAX
 JSR PRINTNEWLINE
-LEA R0, PROMPT_DISPMIN	; display lowest entered score
-PUTS
+JSR PRNT_DISPMIN	; display lowest entered score
 JSR PRINTMIN
 JSR PRINTNEWLINE
-LEA R0, PROMPT_DISPAVG	; display average of all entered scores
-PUTS
+JSR PRNT_DISPAVG	; display average of all entered scores
 JSR PRINTAVG
 JSR PRINTNEWLINE
-LEA R0, PROMPT_DISPGRDS	; convert scores to letter grades
-PUTS
+JSR PRNT_DISPGRDS	; convert scores to letter grades
 JSR DISPLAYGRADES
 JSR PRINTNEWLINE
-LEA R0, PROMPT_END		; ask user whether to end the program
-PUTS
+JSR PRNT_END	; ask user whether to end the program
 JSR PRINTNEWLINE
 JSR YESORNO
 ADD R3, R3, x0
@@ -78,20 +66,7 @@ BRz START		; user entered yes, so restart program
 ENDPROGRAM HALT		; halt program
 
 ; MAIN ROUTINE DATA
-PROMPT_WELCOME	.STRINGZ "Welcome to the Test Score Calculator!"
-PROMPT_HITENTER	.STRINGZ "Press the enter button when you are finished typing a score."
-PROMPT_5SCORES	.STRINGZ "Please enter 5 test scores (0-100)."
-PROMPT_ENTERPLS	.STRINGZ "Type in the next test score: "
-PROMPT_NO_IN	.STRINGZ "No numbers inputed."
-PROMPT_END 	.STRINGZ "Would you like to end the program? (Y/N)"
-PROMPT_ERR_IN	.STRINGZ "There was an error processing your input. Try again."
-PROMPT_CLEAR	.STRINGZ "Clear all previously entered scores? (Y/N)"
-PROMPT_DISPMAX	.STRINGZ "Highest score: "
-PROMPT_DISPMIN	.STRINGZ "Lowest score: "
-PROMPT_DISPAVG	.STRINGZ "Average score: "
-PROMPT_DISGRDS	.STRINGZ "Letter grades:"
-SCOREARRAY	.BLKW 5
-ARRAYSIZE	.FILL x0
+
 
 ; ---------------------------------------------------------------------------------------------
 
@@ -99,13 +74,105 @@ ARRAYSIZE	.FILL x0
 
 ; ---------------------------------------------------------------------------------------------
 
+; prompt subroutines
+
+PRNT_WELCOME
+LEA R0, PROMPT_WELCOME
+PUTS
+RET
+PROMPT_WELCOME	.STRINGZ "Welcome to the Test Score Calculator!"
+
+PRNT_HITENTER
+LEA R0, PROMPT_HITENTER
+PUTS
+RET
+PROMPT_HITENTER	.STRINGZ "Press the enter button when you are finished typing a score."
+
+PRNT_5SCORES
+LEA R0, PROMPT_5SCORES
+PUTS
+RET
+PROMPT_5SCORES	.STRINGZ "Please enter 5 test scores (0-100)."
+
+PRNT_ENTERPLS
+LEA R0, PROMPT_ENTERPLS
+PUTS
+RET
+PROMPT_ENTERPLS	.STRINGZ "Type in the next test score: "
+
+PRNT_NO_IN
+LEA R0, PROMPT_NO_IN
+PUTS
+RET
+PROMPT_NO_IN	.STRINGZ "No numbers inputed."
+
+PRNT_END
+LEA R0, PROMPT_END
+PUTS
+RET
+PROMPT_END 	.STRINGZ "Would you like to end the program? (Y/N)"
+
+PRNT_ERR_IN
+LEA R0, PROMPT_ERR_IN
+PUTS
+RET
+PROMPT_ERR_IN	.STRINGZ "There was an error processing your input. Try again."
+
+PRNT_CLEAR
+LEA R0, PROMPT_CLEAR
+PUTS
+RET
+PROMPT_CLEAR	.STRINGZ "Clear all previously entered scores? (Y/N)"
+
+PRNT_DISPMAX
+LEA R0, PROMPT_DISPMAX
+PUTS
+RET
+PROMPT_DISPMAX	.STRINGZ "Highest score: "
+
+PRNT_DISPMIN
+LEA R0, PROMPT_DISPMIN
+PUTS
+RET
+PROMPT_DISPMIN	.STRINGZ "Lowest score: "
+
+PRNT_DISPAVG
+LEA R0, PROMPT_DISPAVG
+PUTS
+RET
+PROMPT_DISPAVG	.STRINGZ "Average score: "
+
+PRNT_DISPGRDS
+LEA R0, PROMPT_DISPGRDS
+PUTS
+RET
+PROMPT_DISPGRDS	.STRINGZ "Letter grades:"
+
+; ---------------------------------------------------------------------------------------------
+
 ; main program subroutines
+
+; array data
+ARRAYSIZE	.FILL x0
+SCOREARRAY	.BLKW 5
 
 PRINTNEWLINE		; print a newline to the console
 AND R0, R0, x0
 ADD R0, R0, xA
 OUT
 RET
+
+GETARRAYSIZE		; places current array size in R3
+LD R3, ARRAYSIZE
+RET
+
+CLEARARRAY		; empty the array
+ST R3, AR3		; save R3
+AND R3, R3, x0
+ST R3, ARRAYSIZE
+LD R3, AR3		; restore R3
+RET
+AR3	.FILL x0
 
 KBNUMIN			; processes KB input and pushes total value to stack
 ST R7, MAINR7		; set R3 to 1 if at least 1 value is on the stack, -1 otherwise
