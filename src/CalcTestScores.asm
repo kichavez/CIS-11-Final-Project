@@ -27,21 +27,46 @@ LOOP_SCORES
 LEA R0, PROMPT_ENTERPLS
 PUTS
 JSR KBNUMIN
-LD R0, ARRAYSIZE
+ADD R3, R3, x0		; check if the user left the input blank
+BRzp CONT_SCORE_LOOP
+LEA R0, PROMPT_NO_IN
+PUTS
+LD R0, NEWLINE
+OUT
+LEA R0, PROMPT_END	; ask whether to end program
+PUTS
+LD R0, NEWLINE
+OUT
+JSR YESORNO
+ADD R3, R3, x0
+BRp ENDPROGRAM		; user entered yes, so end program
+LEA R0, PROMPT_CLEAR	; ask whether to clear previously entered scores
+PUTS
+LD R0, NEWLINE
+JSR YESORNO
+ADD R3, R3, x0
+BRz LOOP_SCORES		; NO: keep all previously entered scores and continue loop
+BRp START		; YES: clear all previously entered scores, so restart program
+CONT_SCORE_LOOP
 JSR STACK2NUM		; try to add the input to the stack
+ADD R3, R3, x0		; check if push was successful
+
+LD R0, ARRAYSIZE
 ADD R0, R0, #-5		; check if 5 scores were entered
 BRn LOOP_SCORES		; back to top if array size < 5
 
-HALT
+
+ENDPROGRAM HALT
 
 ; MAIN ROUTINE DATA
 PROMPT_WELCOME	.STRINGZ "Welcome to the Test Score Calculator!"
 PROMPT_HITENTER	.STRINGZ "Press the enter button when you are finished typing a score."
 PROMPT_5SCORES	.STRINGZ "Please enter 5 test scores (0-100)."
 PROMPT_ENTERPLS	.STRINGZ "Type in the next test score: "
-PROMPT_END 	.STRINGZ "Would you like to end the program?"
-PROMPT_ERR_IN	.STRINGZ "There was an error processing your input. Try again"
-PROMPT_CLEAR	.STRINGZ "Clear all previously entered scores?"
+PROMPT_NO_IN	.STRINGZ "No numbers inputed."
+PROMPT_END 	.STRINGZ "Would you like to end the program? (Y/N)"
+PROMPT_ERR_IN	.STRINGZ "There was an error processing your input. Try again."
+PROMPT_CLEAR	.STRINGZ "Clear all previously entered scores? (Y/N)"
 PROMPT_DISPMAX	.STRINGZ "Highest score: "
 PROMPT_DISPMIN	.STRINGZ "Lowest score: "
 PROMPT_DISPAVG	.STRINGZ "Average score: "
@@ -133,14 +158,12 @@ ADD R1, R1, #10
 JSR MULT		; we move up by a factor of 10, the first number is in the 1's place
 ADD R2, R3, x0		; copy result to R2 for next loop iteration
 BR POPPIN_LOOP
-
 STACKEMPT
 ADD R4, R4, x0
-BRnz STCK2ERR		; total was somehow negative
+BRn STCK2ERR		; total was somehow negative
 LD R1, ARRAYSIZE	; array size doubles as an offset
 LEA R2, SCOREARRAY	; R2 now holds address of SCOREARRAY
 STR R4, R2, R1		; store total to address of SCOREARRAY + R1
-LD R1, ARRAYSIZE
 ADD R1, R1, x1		; increase array size by 1
 ST R1, ARRAYSIZE	; save new array size
 S2NFIN
@@ -346,11 +369,52 @@ PR5	.FILL x0
 PR6	.FILL x0
 PR7	.FILL x0	; we will restore these before returning
 
+YESORNO			; store whether user entered Y or N (case-insensitive)
+ST R0, YNR0		; 1 = yes, 0 = no, stored in R3
+ST R1, YNR1
+ST R2, YNR2		; save registers
+YN_LOOP
+GETC
+ADD R1, R0, x0		; copy user input to parameter
+JSR FROMASCII
+LD R2, NEGCAPY
+ADD R2, R2, R3		; check if input is 'Y'
+BRz VALIDYES
+LD R2, NEGLOWY
+ADD R2, R2, R3		; check if input is 'y'
+BRz VALIDYES
+LD R2, NEGCAPN
+ADD R2, R2, R3		; check if input is 'N'
+BRz VALIDNO
+LD R2, NEGLOWN
+ADD R2, R2, R3		; check if input is 'n'
+BRz VALIDNO
+BR YN_LOOP		; user input was not valid, so get new character
+VALIDYES
+AND R3, R3, x0
+ADD R3, R3, x1		; R3 = 1
+BR ENDYORN
+VALIDNO
+AND R3, R3, x0		; R3 = 0
+ENDYORN
+OUT			; echo keyboard input
+LD R0, YNR0
+LD R1, YNR1
+LD R2, YNR2		; restore registers
+RET
+YNR0	.FILL x0
+YNR1	.FILL x0
+YNR2	.FILL x0
+
 ; ASCII SUBROUTINE DATA
 ; We'll use these to convert numbers to ASCII and vice-versa
 ASCIIOFFSET	.FILL #48
 NASCIIOFFSET	.FILL #-48
 DEC100		.FILL #100
+NEGCAPY		.FILL #-89
+NEGLOWY		.FILL #-121
+NEGCAPN		.FILL #-78
+NEGLOWN		.FILL #-110
 
 ; ---------------------------------------------------------------------------------------------
 
@@ -494,4 +558,5 @@ RET
 MODSAV1	.FILL x0
 MODSAV2	.FILL x0
 MODSAV7	.FILL x0
+
 .END
