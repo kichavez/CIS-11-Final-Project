@@ -329,10 +329,41 @@ ST R7, DGR7		; save registers
 AND R4, R4, x0		; we will use R4 as our counter
 LEA R5, SCOREARRAY	; put the address of the scores array in R5
 AND R2, R2, x0
-ADD R2, R2, #10		; R2 = 10 for modulo operation
+ADD R2, R2, #10		; R2 = 10 for division since we only care about the 10s place
 DG_LOOP
+LD R0, NEWLINE		; print grade on next line
+OUT
 LDR R1, R5, R4		; load SCOREARRAY[R4] into R1
-JSR MOD
+ADD R1, R0		; copy to R0 for printing
+JSR PRINTNUM
+LEA R0, SPACEDASH
+PUTS
+JSR DIV
+ADD R1, R3, #-10	; check if score = 100
+BRz AGRADE
+ADD R1, R3, #-9		; check if score = 90-99
+BRz AGRADE
+ADD R1, R3, #-8		; check 80-89
+BRz BGRADE
+ADD R1, R3, #-7		; check 70-79
+BRz CGRADE
+ADD R1, R3, #-6		; check 60-69
+BRz DGRADE
+LD R0, ASCIIF		; if not any of the above, grade must be F
+BR DG_PRINT
+AGRADE LD R0, ASCIIA
+	BR DG_PRINT
+BGRADE LD R0, ASCIIB
+	BR DG_PRINT
+CGRADE LD R0, ASCIIC
+	BR DG_PRINT
+DGRADE LD R0, ASCIID
+	BR DG_PRINT
+DG_PRINT		; print the letter grade finally
+OUT
+ADD R4, R4, x1
+ADD R1, R1, #-5		; check if we've looped 5 times
+BRn DG_LOOP		; back to start of loop if not
 LD R0, DGR0
 LD R1, DGR1
 LD R2, DGR2
@@ -353,6 +384,7 @@ DGR3	.FILL x0
 DGR4	.FILL x0
 DGR5	.FILL x0
 DGR7	.FILL x0
+SPACEDASH	.STRINGZ " - "
 
 ; ---------------------------------------------------------------------------------------------
 
