@@ -390,6 +390,8 @@ BRz PRINTTENS		; skip printing this if result is 0
 JSR TOASCII		; print hundreds place
 ADD R0, R3, x0
 OUT			; put character to console
+LD R0, ASCIIOFFSET	; ASCIIOFFSET is ASCII 0
+OUT			; we print another 0 here because 100 is a special case
 PRINTTENS
 LD R2, DEC100
 LD R1, PR0
