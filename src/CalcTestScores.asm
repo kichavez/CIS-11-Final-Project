@@ -8,21 +8,18 @@
 ; Output: Displays maximum, minimum, average score and letter grade
 ;	  equivalence (0 - 50 = F, 60 - 69 = D, 70 - 79 = C, 
 ;	  80 - 89 = B, 90 - 100 = A) on the console
-
-; MAIN ROUTINE
 .ORIG x3000
+; MAIN ROUTINE
 LEA R0, PROMPT_WELCOME
 PUTS
-LD R0, NEWLINE
-OUT
+JSR PRINTNEWLINE
 START			; where we reset the program if the user chooses
 AND R0, R0, x0		; clear R0 to reset array size
 ST R0, ARRAYSIZE
 JSR CLEARSTACK
 LEA R0, PROMPT_5SCORES
 PUTS
-LD R0, NEWLINE
-OUT
+JSR PRINTNEWLINE
 LOOP_SCORES
 LEA R0, PROMPT_ENTERPLS
 PUTS
@@ -31,19 +28,16 @@ ADD R3, R3, x0		; check if the user left the input blank
 BRzp CONT_SCORE_LOOP
 LEA R0, PROMPT_NO_IN
 PUTS
-LD R0, NEWLINE
-OUT
+JSR PRINTNEWLINE
 LEA R0, PROMPT_END	; ask whether to end program
 PUTS
-LD R0, NEWLINE
-OUT
+JSR PRINTNEWLINE
 JSR YESORNO
 ADD R3, R3, x0
 BRp ENDPROGRAM		; user entered yes, so end program
 LEA R0, PROMPT_CLEAR	; ask whether to clear previously entered scores
 PUTS
-LD R0, NEWLINE
-OUT
+JSR PRINTNEWLINE
 JSR YESORNO
 ADD R3, R3, x0
 BRz LOOP_SCORES		; NO: keep all previously entered scores and continue loop
@@ -54,8 +48,7 @@ ADD R3, R3, x0		; check if push was successful
 BRp LOOP_SCORES_CHK
 LEA R0, PROMPT_ERR_IN	; let user know there was an error parsing the input
 PUTS
-LD R0, NEWLINE
-OUT
+JSR PRINTNEWLINE
 LOOP_SCORES_CHK
 LD R0, ARRAYSIZE
 ADD R0, R0, #-5		; check if 5 scores were entered
@@ -80,7 +73,7 @@ PUTS
 JSR DISPLAYGRADES
 LD R0, NEWLINE
 OUT
-LEA PROMPT_END		; ask user whether to end the program
+LEA R0, PROMPT_END		; ask user whether to end the program
 PUTS
 LD R0, NEWLINE
 OUT
@@ -102,7 +95,6 @@ PROMPT_DISPMAX	.STRINGZ "Highest score: "
 PROMPT_DISPMIN	.STRINGZ "Lowest score: "
 PROMPT_DISPAVG	.STRINGZ "Average score: "
 PROMPT_DISGRDS	.STRINGZ "Letter grades:"
-NEWLINE		.FILL xA
 SCOREARRAY	.BLKW 5
 ARRAYSIZE	.FILL x0
 
@@ -113,6 +105,12 @@ ARRAYSIZE	.FILL x0
 ; ---------------------------------------------------------------------------------------------
 
 ; main program subroutines
+
+PRINTNEWLINE		; print a newline to the console
+AND R0, R0, x0
+ADD R0, R0, xA
+OUT
+RET
 
 KBNUMIN			; processes KB input and pushes total value to stack
 ST R7, MAINR7		; set R3 to 1 if at least 1 value is on the stack, -1 otherwise
@@ -190,7 +188,8 @@ ADD R4, R4, x0
 BRn STCK2ERR		; total was somehow negative
 LD R1, ARRAYSIZE	; array size doubles as an offset
 LEA R2, SCOREARRAY	; R2 now holds address of SCOREARRAY
-STR R4, R2, R1		; store total to address of SCOREARRAY + R1
+ADD R2, R2, R1		; R2 should now hold the address of SCOREARRAY[R1]
+STR R4, R2, x0		; save the score to the array
 ADD R1, R1, x1		; increase array size by 1
 ST R1, ARRAYSIZE	; save new array size
 AND R3, R3, x0
@@ -225,9 +224,10 @@ ST R4, AVGR4
 ST R7, AVGR7		; save registers
 AND R4, R4, x0		; we will keep track of the loop iteration in R4
 AND R0, R0, x0		; we will store our total here
-LEA R2, SCOREARRAY	; put the address of the score array in R2
 AVERAGE_LOOP
-LDR R1, R2, R4		; put nth element of array into R1
+LEA R2, SCOREARRAY	; put the address of the score array in R2
+ADD R2, R2, R4		; go to nth element of array		
+LDR R1, R2, x0		; put nth element of array into R1
 ADD R0, R1, R0		; add to total
 ADD R4, R4, x1		; increment counter
 ADD R3, R4, #-5		; loop condition check
@@ -261,9 +261,10 @@ ST R5, MAXR5
 ST R7, MAXR7		; save registers
 AND R4, R4, x0		; loop counter
 AND R0, R0, x0		; we will store the maximum found here
-LEA R1, SCOREARRAY	; load address of score array into R1
 MAX_LOOP
-LDR R2, R1, R4		; load SCOREARRAY[R4] into R2
+LEA R1, SCOREARRAY	; load address of score array into R1
+ADD R1, R1, R4
+LDR R2, R1, x0		; load SCOREARRAY[R4] into R2
 NOT R2, R3
 ADD R3, R3, x1		; R3 = -R2
 ADD R3, R3, R0		; compare R3 to R0
@@ -297,9 +298,10 @@ ST R5, MINR5
 ST R7, MINR7		; save registers
 AND R4, R4, x0		; loop counter
 AND R0, R0, x0		; we will store the minimum found here
-LEA R1, SCOREARRAY	; load address of score array into R1
 MIN_LOOP
-LDR R2, R1, R4		; load SCOREARRAY[R4] into R2
+LEA R1, SCOREARRAY	; load address of score array into R1
+ADD R1, R1, R4
+LDR R2, R1, x0		; load SCOREARRAY[R4] into R2
 NOT R2, R3
 ADD R3, R3, x1		; R3 = -R2
 ADD R3, R3, R0		; compare R3 to R0
@@ -333,14 +335,14 @@ ST R4, DGR4
 ST R5, DGR5
 ST R7, DGR7		; save registers
 AND R4, R4, x0		; we will use R4 as our counter
-LEA R5, SCOREARRAY	; put the address of the scores array in R5
 AND R2, R2, x0
 ADD R2, R2, #10		; R2 = 10 for division since we only care about the 10s place
 DG_LOOP
-LD R0, NEWLINE		; print grade on next line
-OUT
-LDR R1, R5, R4		; load SCOREARRAY[R4] into R1
-ADD R1, R0		; copy to R0 for printing
+JSR PRINTNEWLINE
+LEA R5, SCOREARRAY	; put the address of the scores array in R5
+ADD R5, R5, R4
+LDR R1, R5, x0		; load SCOREARRAY[R4] into R1
+ADD R1, R0, x0		; copy to R0 for printing
 JSR PRINTNUM
 LEA R0, SPACEDASH
 PUTS
