@@ -56,27 +56,22 @@ BRn LOOP_SCORES		; back to top if array size < 5
 LEA R0, PROMPT_DISPMAX	; display highest entered score
 PUTS
 JSR PRINTMAX
-LD R0, NEWLINE
-OUT
+JSR PRINTNEWLINE
 LEA R0, PROMPT_DISPMIN	; display lowest entered score
 PUTS
 JSR PRINTMIN
-LD R0, NEWLINE
-OUT
+JSR PRINTNEWLINE
 LEA R0, PROMPT_DISPAVG	; display average of all entered scores
 PUTS
 JSR PRINTAVG
-LD R0, NEWLINE
-OUT
+JSR PRINTNEWLINE
 LEA R0, PROMPT_DISPGRDS	; convert scores to letter grades
 PUTS
 JSR DISPLAYGRADES
-LD R0, NEWLINE
-OUT
+JSR PRINTNEWLINE
 LEA R0, PROMPT_END		; ask user whether to end the program
 PUTS
-LD R0, NEWLINE
-OUT
+JSR PRINTNEWLINE
 JSR YESORNO
 ADD R3, R3, x0
 BRz START		; user entered yes, so restart program
