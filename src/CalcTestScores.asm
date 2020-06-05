@@ -83,7 +83,7 @@ HALT			; halt program
 
 ; prompt subroutines
 
-; for each routine, we store R7 since OUT overwrites it
+; for each routine, we store R7 since PUTS overwrites it
 
 PRNT_WELCOME
 ST R7, WELCR7
@@ -348,7 +348,7 @@ ST R7, AVGR7		; save registers
 AND R4, R4, x0		; we will keep track of the loop iteration in R4
 AND R0, R0, x0		; we will store our total here
 AVERAGE_LOOP
-LEA R2, SCOREARRAY	; put the address of the score array in R2
+LEA R2, SCOREARRAY	; R2 now points to first element of array
 ADD R2, R2, R4		; go to nth element of array		
 LDR R1, R2, x0		; put nth element of array into R1
 ADD R0, R1, R0		; add to total
@@ -385,7 +385,7 @@ ST R7, MAXR7		; save registers
 AND R4, R4, x0		; loop counter
 AND R0, R0, x0		; we will store the maximum found here
 MAX_LOOP
-LEA R1, SCOREARRAY	; load address of score array into R1
+LEA R1, SCOREARRAY	; R1 now points to first element of array
 ADD R1, R1, R4
 LDR R2, R1, x0		; load SCOREARRAY[R4] into R2
 NOT R3, R2
@@ -420,7 +420,7 @@ ST R4, MINR4
 ST R5, MINR5
 ST R7, MINR7		; save registers
 AND R4, R4, x0		; loop counter
-LEA R1, SCOREARRAY	; load address of score array into R1
+LEA R1, SCOREARRAY	; R1 now points to first element of array
 LDR R0, R1, x0		; first value in array is automatically current minimum
 MIN_LOOP
 LEA R1, SCOREARRAY	; load address of score array into R1
@@ -463,7 +463,7 @@ AND R2, R2, x0
 ADD R2, R2, #10		; R2 = 10 for division since we only care about the 10s place
 DG_LOOP
 JSR PRINTNEWLINE
-LEA R5, SCOREARRAY	; put the address of the scores array in R5
+LEA R5, SCOREARRAY	; R5 points to SCOREARRAY
 ADD R5, R5, R4
 LDR R1, R5, x0		; load SCOREARRAY[R4] into R1
 ADD R0, R1, x0		; copy to R0 for printing
