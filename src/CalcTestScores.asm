@@ -23,16 +23,19 @@ JSR PRNT_ENTERPLS	; generic prompt displayed every loop
 JSR KBNUMIN
 ADD R3, R3, x0		; check if the user left the input blank
 BRzp CONT_SCORE_LOOP
+JSR PRINTNEWLINE
 JSR PRNT_NO_IN		; let user know no input was detected (i.e. a blank line)
 JSR PRINTNEWLINE
 JSR PRNT_END		; ask whether to end program
 JSR PRINTNEWLINE
 JSR YESORNO
+JSR PRINTNEWLINE
 ADD R3, R3, x0
 BRp ENDPROGRAM		; user entered yes, so end program
 JSR PRNT_CLEAR
 JSR PRINTNEWLINE
 JSR YESORNO
+JSR PRINTNEWLINE
 ADD R3, R3, x0
 BRz LOOP_SCORES		; NO: keep all previously entered scores and continue loop
 BRp START		; YES: clear all previously entered scores, so restart program
@@ -40,6 +43,7 @@ CONT_SCORE_LOOP
 JSR STACK2NUM		; try to add the input to the stack
 ADD R3, R3, x0		; check if push was successful
 BRp LOOP_SCORES_CHK
+JSR PRINTNEWLINE
 JSR PRNT_ERR_IN		; let user know there was an error parsing the input
 LOOP_SCORES_CHK
 JSR PRINTNEWLINE
@@ -581,21 +585,21 @@ YESORNO			; store whether user entered Y or N (case-insensitive)
 ST R0, YNR0		; 1 = yes, 0 = no, stored in R3
 ST R1, YNR1
 ST R2, YNR2		; save registers
+ST R7, YNR7
 YN_LOOP
 GETC
 ADD R1, R0, x0		; copy user input to parameter
-JSR FROMASCII
 LD R2, NEGCAPY
-ADD R2, R2, R3		; check if input is 'Y'
+ADD R2, R2, R0		; check if input is 'Y'
 BRz VALIDYES
 LD R2, NEGLOWY
-ADD R2, R2, R3		; check if input is 'y'
+ADD R2, R2, R0		; check if input is 'y'
 BRz VALIDYES
 LD R2, NEGCAPN
-ADD R2, R2, R3		; check if input is 'N'
+ADD R2, R2, R0		; check if input is 'N'
 BRz VALIDNO
 LD R2, NEGLOWN
-ADD R2, R2, R3		; check if input is 'n'
+ADD R2, R2, R0		; check if input is 'n'
 BRz VALIDNO
 BR YN_LOOP		; user input was not valid, so get new character
 VALIDYES
@@ -609,10 +613,12 @@ OUT			; echo keyboard input
 LD R0, YNR0
 LD R1, YNR1
 LD R2, YNR2		; restore registers
+LD R7, YNR7
 RET
 YNR0	.FILL x0
 YNR1	.FILL x0
 YNR2	.FILL x0
+YNR7	.FILL x0
 
 ; ASCII SUBROUTINE DATA
 ; We'll use these to convert numbers to ASCII and vice-versa
@@ -697,7 +703,7 @@ SP		.FILL x0	; points to top of stack
 MULT			; multiply R1 by R2 and store in R3
 ST R1, MSAV1
 ST R2, MSAV2		; save registers
-AND R3, R3, R0
+AND R3, R3, x0		; clear R3
 ADD R1, R1, x0
 BRn MULTNEG		; skip to end of function if either parameter is negative
 BRz MULTEND		; skip to end with R3 as 0 if R1 is 0
