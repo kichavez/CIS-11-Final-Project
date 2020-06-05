@@ -68,7 +68,9 @@ JSR YESORNO
 JSR PRINTNEWLINE
 ADD R3, R3, x0
 BRz START		; user entered yes, so restart program
-ENDPROGRAM HALT		; halt program
+ENDPROGRAM 
+JSR PRNT_GOODBYE	; goodbye user
+HALT			; halt program
 
 ; MAIN ROUTINE DATA
 
@@ -190,6 +192,15 @@ LD R7, GRDSR7
 RET
 PROMPT_DISPGRDS	.STRINGZ "Letter grades:"
 GRDSR7	.FILL x0
+
+PRNT_GOODBYE
+ST R7, BYER7
+LEA R0, PROMPT_GOODBYE
+PUTS
+LD R7, BYER7
+RET
+BYER7	.FILL x0
+PROMPT_GOODBYE	.STRINGZ "Thanks for using the grade calculator! Goodbye!"
 
 ; ---------------------------------------------------------------------------------------------
 
