@@ -1,0 +1,6 @@
+# LC-3 files
+*.bin
+*.hex
+*.lst
+*.obj
+*.sym
