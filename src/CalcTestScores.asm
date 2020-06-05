@@ -23,7 +23,7 @@ JSR PRNT_ENTERPLS	; generic prompt displayed every loop
 JSR KBNUMIN
 ADD R3, R3, x0		; check if the user left the input blank
 BRzp CONT_SCORE_LOOP
-JSR PRNT_NO_IN	; let user know no input was detected (i.e. a blank line)
+JSR PRNT_NO_IN		; let user know no input was detected (i.e. a blank line)
 JSR PRINTNEWLINE
 JSR PRNT_END		; ask whether to end program
 JSR PRINTNEWLINE
