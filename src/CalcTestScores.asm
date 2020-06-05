@@ -65,6 +65,7 @@ JSR PRINTNEWLINE
 JSR PRNT_END	; ask user whether to end the program
 JSR PRINTNEWLINE
 JSR YESORNO
+JSR PRINTNEWLINE
 ADD R3, R3, x0
 BRz START		; user entered yes, so restart program
 ENDPROGRAM HALT		; halt program
@@ -347,7 +348,7 @@ ADD R1, R0, x0
 AND R2, R2, x0
 ADD R2, R2, x5		; load parameters for division subroutine
 JSR DIV			; get mean by dividing total by 5
-ADD R3, R3, x0		; copy result to R0
+ADD R0, R3, x0		; copy result to R0
 JSR PRINTNUM		; print R0 to console
 LD R0, AVGR0
 LD R1, AVGR1
@@ -408,12 +409,13 @@ ST R4, MINR4
 ST R5, MINR5
 ST R7, MINR7		; save registers
 AND R4, R4, x0		; loop counter
-AND R0, R0, x0		; we will store the minimum found here
+LEA R1, SCOREARRAY	; load address of score array into R1
+LDR R0, R1, x0		; first value in array is automatically current minimum
 MIN_LOOP
 LEA R1, SCOREARRAY	; load address of score array into R1
 ADD R1, R1, R4
 LDR R2, R1, x0		; load SCOREARRAY[R4] into R2
-NOT R2, R3
+NOT R3, R2
 ADD R3, R3, x1		; R3 = -R2
 ADD R3, R3, R0		; compare R3 to R0
 BRn MINLCHECK		; current loop value is smaller or equal if R3 isn't negative
@@ -453,7 +455,7 @@ JSR PRINTNEWLINE
 LEA R5, SCOREARRAY	; put the address of the scores array in R5
 ADD R5, R5, R4
 LDR R1, R5, x0		; load SCOREARRAY[R4] into R1
-ADD R1, R0, x0		; copy to R0 for printing
+ADD R0, R1, x0		; copy to R0 for printing
 JSR PRINTNUM
 LEA R0, SPACEDASH
 PUTS
@@ -481,7 +483,7 @@ DGRADE LD R0, ASCIID
 DG_PRINT		; print the letter grade finally
 OUT
 ADD R4, R4, x1
-ADD R1, R1, #-5		; check if we've looped 5 times
+ADD R1, R4, #-5		; check if we've looped 5 times
 BRn DG_LOOP		; back to start of loop if not
 LD R0, DGR0
 LD R1, DGR1
@@ -767,7 +769,7 @@ JSR DIV
 ADD R1, R3, x0
 BRn ENDMOD		; error ocurred when dividing
 JSR MULT
-LD R1, MSAV1
+LD R1, MODSAV1
 ADD R3, R3, x0		; check for error when dividing
 BRn ENDMOD
 NOT R3, R3
