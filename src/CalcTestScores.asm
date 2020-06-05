@@ -672,7 +672,7 @@ LD R1, STACK_BEGIN_N
 LD R2, SP
 ADD R2, R2, #-1
 ADD R1, R2, R1
-BRn EMPTY		; stack underflow
+BRnz EMPTY		; stack underflow
 ADD R2, R2, x1		; go back to current stack element
 LDR R3, R2, x0		; get top of stack
 ADD R2, R2, #-1		; pop
