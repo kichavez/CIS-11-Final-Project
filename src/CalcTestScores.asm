@@ -62,7 +62,7 @@ JSR PRINTNEWLINE
 JSR PRNT_DISPGRDS	; convert scores to letter grades
 JSR DISPLAYGRADES
 JSR PRINTNEWLINE
-JSR PRNT_END	; ask user whether to end the program
+JSR PRNT_END		; ask user whether to end the program
 JSR PRINTNEWLINE
 JSR YESORNO
 JSR PRINTNEWLINE
