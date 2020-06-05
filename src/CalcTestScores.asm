@@ -376,7 +376,7 @@ MAX_LOOP
 LEA R1, SCOREARRAY	; load address of score array into R1
 ADD R1, R1, R4
 LDR R2, R1, x0		; load SCOREARRAY[R4] into R2
-NOT R2, R3
+NOT R3, R2
 ADD R3, R3, x1		; R3 = -R2
 ADD R3, R3, R0		; compare R3 to R0
 BRzp MAXLCHECK		; current loop value is smaller or equal if R3 isn't negative
@@ -512,7 +512,7 @@ SPACEDASH	.STRINGZ " - "
 TOASCII			; convert value in R1 to ASCII and store in R3
 ST R2, ASCIISAVEREG
 LD R2, ASCIIOFFSET
-ADD R1, R1, R2
+ADD R3, R1, R2
 LD R2, ASCIISAVEREG
 RET
 ASCIISAVEREG .FILL x0
@@ -542,14 +542,15 @@ JSR TOASCII		; print hundreds place
 ADD R0, R3, x0
 OUT			; put character to console
 LD R0, ASCIIOFFSET	; ASCIIOFFSET is ASCII 0
-OUT			; we print another 0 here because 100 is a special case
+OUT
+OUT			; 100 is a special case, so let's skip to the end
+BR PRNTNUMFIN
 PRINTTENS
-LD R2, DEC100
+AND R2, R2, x0
+ADD R2, R2, #10
 LD R1, PR0
-JSR MOD			; R3 = parameter % 100
-ADD R1, R3, x0		; copy result of modulo to first parameter
-JSR DIV
-ADD R1, R3, x0
+JSR DIV			; R3 = parameter / 10
+ADD R1, R3, x0		; copy result of division to first parameter
 BRz PRINTONES		; skip to printing 1s place if this is 0
 JSR TOASCII		; print tens place
 ADD R0, R3, x0
@@ -563,6 +564,7 @@ ADD R1, R3, x0		; copy result to R1
 JSR TOASCII
 ADD R0, R3, x0		; R3 should now have ASCII value of value in ones
 OUT			; output character to console
+PRNTNUMFIN
 LD R0, PR0
 LD R1, PR1
 LD R2, PR2
@@ -636,11 +638,18 @@ NEGLOWN		.FILL #-110
 
 CLEARSTACK		; set stack size to 0
 ST R0, CLRSAVREG	; save R0
+ST R7, CLRSAVR7
 LD R0, STACK_BEGIN
 ST R0, SP		; reset stack pointer
+JSR PUSH
+JSR PUSH
+JSR POP
+JSR POP			; don't ask why this fixes something
 LD R0, CLRSAVREG	; restore R0
+LD R7, CLRSAVR7		; restore return value
 RET
 CLRSAVREG .FILL x0
+CLRSAVR7 .FILL	x0
 
 PUSH			; push R0 to top of stack, set R3 to 1 if successful and -1 otherwise
 ST R1, PSHR1
@@ -727,7 +736,7 @@ MSAV2 .FILL x0
 DIV			; integer division of R1 by R2 and store in R3
 ST R1, DSAV1
 ST R2, DSAV2		; save registers
-AND R3, R3, R0
+AND R3, R3, x0
 ADD R1, R1, x0
 BRn DIVNEG		; skip to end of function if either parameter is negative
 BRz DIVEND		; skip to end with R3 as 0 if R1 is 0
