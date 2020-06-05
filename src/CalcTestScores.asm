@@ -83,7 +83,7 @@ HALT			; halt program
 
 ; prompt subroutines
 
-; for each routine, we store R7 since OUT overwrites it
+; for each routine, we store R7 since PUTS overwrites it
 
 PRNT_WELCOME
 ST R7, WELCR7
