@@ -223,15 +223,15 @@ ST R4, MAINR4
 AND R4, R4, x0		; we use this to check if the user entered no values
 KB_LOOP
 GETC
-ADD R1, R0, x0		; copy keyboard input to parameter
-JSR FROMASCII
 LD R2, NASCII0
-ADD R1, R2, R3		; check if the character is below ASCII 0
+ADD R1, R0, R2		; check if the character is below ASCII 0
 BRn NOTASCIINUM
 LD R2, NASCII9
-ADD R1, R2, R3
+ADD R1, R0, R2
 BRp NOTASCIINUM		; check if character is above ASCII 9
 OUT			; Mirror the character back to the console
+ADD R1, R0, x0		; copy R0 to R1 for the FROMASCII function
+JSR FROMASCII		; set R3 to integer value of ASCII number
 ADD R0, R3, x0		; copy R3 to R0 to be pushed
 JSR PUSH
 ADD R3, R3, x0
@@ -239,10 +239,11 @@ BRz ENDKBIN		; return if there was an error pushing to the stack
 ADD R4, R4, x1		; add to R4 to signify at least 1 value is in the stack
 BR KB_LOOP		; process next character
 NOTASCIINUM
-LD R2, 0xA
+AND R2, R2, x0
+ADD R2, R2, xA
 NOT R2, R2
 ADD R2, R2, x1		; R2 = -0xA, ASCII value of newline
-ADD R1, R2, R3		; check if user entered a newline (i.e. pushed enter)
+ADD R1, R2, R0		; check if user entered a newline (i.e. pushed enter)
 BRz ENDKBIN
 BR KB_LOOP		; User entered a character not newline or enter, so do nothing
 ENDKBIN
@@ -267,7 +268,8 @@ ST R0, TONUMR0		; put 1 into R3 if successful, -1 otherwise
 ST R1, TONUMR1
 ST R2, TONUMR2
 ST R4, TONUMR4
-ST R5, TONUMR5		; save registers
+ST R5, TONUMR5
+ST R7, TONUMR7		; save registers
 LD R5, NEG100		; we will be using this multiple times
 AND R2, R2, x0
 ADD R2, R2, x1		; R2 = 1
@@ -302,7 +304,8 @@ LD R0, TONUMR0
 LD R1, TONUMR1
 LD R2, TONUMR2
 LD R4, TONUMR4
-LD R5, TONUMR5		; restore registers
+LD R5, TONUMR5
+LD R7, TONUMR7		; restore registers
 RET
 STCK2ERR
 AND R3, R3, x0		; stack was empty
@@ -314,6 +317,7 @@ TONUMR1	.FILL x0
 TONUMR2	.FILL x0
 TONUMR4	.FILL x0
 TONUMR5	.FILL x0
+TONUMR7	.FILL x0
 NASCII0		.FILL #-48	; we use these to check if keys are 0-9
 NASCII9		.FILL #-57
 NEG100		.FILL #-100	; 100 is the max score
@@ -637,13 +641,11 @@ ST R1, PSHR1
 ST R2, PSHR2		; save registers we'll be using
 LD R1, STACK_END
 LD R2, SP
-LD R1, STACK_BEGIN_N
-ADD R1, R2, R1
-BRn NOPUSH		; stack underflow
 ADD R2, R2, x1		; go to potential next stack slot
 ADD R1, R2, R1		; check for stack size maxed out
-BRp NOPUSH 		; stack too big
+BRp NOPUSH		; stack overflow
 STR R0, R2, x0		; push to the top of stack
+ST R2, SP		; update stack pointer
 AND R3, R3, x0
 ADD R3, R3, x1		; set R3 to 1 to indicate successful push
 BR ENDPUSH		; finish function
@@ -660,13 +662,15 @@ PSHR2 .FILL x0
 POP			; set R3 to top of stack and pop, set to -1 if empty
 ST R1, POPR1
 ST R2, POPR2		; save registers we'll be using
-LD R1, STACK_END
-LD R2, SP
 LD R1, STACK_BEGIN_N
+LD R2, SP
+ADD R2, R2, #-1
 ADD R1, R2, R1
 BRn EMPTY		; stack underflow
+ADD R2, R2, x1		; go back to current stack element
 LDR R3, R2, x0		; get top of stack
 ADD R2, R2, #-1		; pop
+ST R2, SP		; save new stack pointer value
 BR ENDPOP
 EMPTY
 AND R3, R3, x0
