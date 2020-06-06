@@ -251,7 +251,7 @@ JSR FROMASCII		; set R3 to integer value of ASCII number
 ADD R0, R3, x0		; copy R3 to R0 to be pushed
 JSR PUSH
 ADD R3, R3, x0
-BRn KB_LOOP		; return if there was an error pushing to the stack
+BRn KB_LOOP		; don't update R4 because stack did not have new value pushed
 ADD R4, R4, x1		; add to R4 to signify at least 1 value is in the stack
 BR KB_LOOP		; process next character
 NOTASCIINUM
