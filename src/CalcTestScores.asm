@@ -251,7 +251,7 @@ JSR FROMASCII		; set R3 to integer value of ASCII number
 ADD R0, R3, x0		; copy R3 to R0 to be pushed
 JSR PUSH
 ADD R3, R3, x0
-BRz ENDKBIN		; return if there was an error pushing to the stack
+BRn KB_LOOP		; don't update R4 because stack did not have new value pushed
 ADD R4, R4, x1		; add to R4 to signify at least 1 value is in the stack
 BR KB_LOOP		; process next character
 NOTASCIINUM
@@ -542,9 +542,6 @@ ST R0, PR0
 ST R1, PR1
 ST R2, PR2
 ST R3, PR3
-ST R4, PR4
-ST R5, PR5
-ST R6, PR6
 ST R7, PR7		; save registers
 LD R2, DEC100		; we will skip printing the 100s and 10s place if they are 0
 ADD R1, R0, x0		; copy R0 to register to be used as divisor
@@ -582,18 +579,12 @@ LD R0, PR0
 LD R1, PR1
 LD R2, PR2
 LD R3, PR3
-LD R4, PR4
-LD R5, PR5
-LD R6, PR6
 LD R7, PR7		; restore registers
 RET
 PR0	.FILL x0
 PR1	.FILL x0
 PR2	.FILL x0
 PR3	.FILL x0
-PR4	.FILL x0
-PR5	.FILL x0
-PR6	.FILL x0
 PR7	.FILL x0	; we will restore these before returning
 
 YESORNO			; store whether user entered Y or N (case-insensitive)
