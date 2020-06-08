@@ -45,6 +45,7 @@ ADD R3, R3, x0		; check if push was successful
 BRp LOOP_SCORES_CHK
 JSR PRINTNEWLINE
 JSR PRNT_ERR_IN		; let user know there was an error parsing the input
+JSR CLEARSTACK		; discard invalid stack values
 LOOP_SCORES_CHK
 JSR PRINTNEWLINE
 JSR GETARRAYSIZE
