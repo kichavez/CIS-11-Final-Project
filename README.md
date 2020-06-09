@@ -29,5 +29,8 @@ Kevin Chavez, Julissa Mota, Jasmine Gaona, Brian Cabrera
 ### Date of Creation
 4 June 2020
 
+### Date of Most Recent Update
+9 June 2020
+
 ### Program Usage Instructions
-Through the LC-3 Simulator, Run the program and instructions will be displayed through the Console. The Console will instruct the user to input 5 test scores, then it will display the ouput, which is the maximum, minimum, average score and the letter grade equivelance (0-50=F, 60-69=D, 70-79=C, 80-89=B, 90-100=A).
+Through the LC-3 Simulator, Run the program and instructions will be displayed through the Console. The Console will instruct the user to input 5 test scores. The user will push ENTER between each entered test score. The program will then it will display the ouput, which is the maximum, minimum, average score and the letter grade equivelance (0-59=F, 60-69=D, 70-79=C, 80-89=B, 90-100=A).
