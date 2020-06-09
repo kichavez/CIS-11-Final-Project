@@ -18,6 +18,8 @@ JSR CLEARARRAY		; reset array
 JSR CLEARSTACK		; reset stack
 JSR PRNT_5SCORES	; ask user to input 5 scores
 JSR PRINTNEWLINE
+JSR PRNT_PUSHENTR	; let user know to push enter after finishing each score
+JSR PRINTNEWLINE
 LOOP_SCORES
 JSR PRNT_ENTERPLS	; generic prompt displayed every loop
 JSR KBNUMIN
@@ -193,6 +195,15 @@ LD R7, GRDSR7
 RET
 PROMPT_DISPGRDS	.STRINGZ "Letter grades:"
 GRDSR7	.FILL x0
+
+PRNT_PUSHENTR
+ST R7, PENTRR7
+LEA R0, PROMPT_PUSHENTR
+PUTS
+LD R7, PENTRR7
+RET
+PROMPT_PUSHENTR	.STRINGZ "Push ENTER to input the next score."
+PENTRR7	.FILL x0
 
 PRNT_GOODBYE
 ST R7, BYER7
