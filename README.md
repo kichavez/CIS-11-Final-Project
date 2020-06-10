@@ -35,13 +35,7 @@ Kevin Chavez, Julissa Mota, Jasmine Gaona, Brian Cabrera
 ### Program Usage Instructions
   1. Load the program into the LC-3 Simulator
   2. Run the program
-  3. Follow the prompt on screen to enter 5 test scores via the keyboard
-    a. You can submit an empty line to terminate the program early
-  4. After entering the 5th valid score, the program will output the following:
-  
-    a. the highest score
-    b. the lowest score
-    c. the average score
-    d. letter grade equivalents of each inputted score
+  3. Follow the prompt on screen to enter 5 test scores via the keyboard. User can submit an empty line at any point in this step to receive a prompt to terminate the program early
+  4. After entering the 5th valid score, the program will output the lowest score, highest score, average score, and letter grade equivalents to the entered scores
   5. User will be prompted to run the program with 5 new scores or terminate the session
   6. Terminate the program or return to step three, depending on answer to the prompt in step 5
