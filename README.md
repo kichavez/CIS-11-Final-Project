@@ -33,4 +33,14 @@ Kevin Chavez, Julissa Mota, Jasmine Gaona, Brian Cabrera
 9 June 2020
 
 ### Program Usage Instructions
-Through the LC-3 Simulator, Run the program and instructions will be displayed through the Console. The Console will instruct the user to input 5 test scores. The user will push ENTER between each entered test score. The program will then it will display the ouput, which is the maximum, minimum, average score and the letter grade equivelance (0-59=F, 60-69=D, 70-79=C, 80-89=B, 90-100=A).
+  1. Load the program into the LC-3 Simulator
+  2. Run the program
+  3. Follow the prompt on screen to enter 5 test scores via the keyboard
+    a. You can submit an empty line to terminate the program early
+  4. After entering the 5th valid score, the program will output the following:
+    a. the highest score
+    b. the lowest score
+    c. the average score
+    d. letter grade equivalents of each inputted score
+  5. User will be prompted to run the program with 5 new scores or terminate the session
+  6. Terminate the program or return to step three, depending on answer to the prompt in step 5
