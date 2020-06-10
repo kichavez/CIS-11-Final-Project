@@ -38,6 +38,7 @@ Kevin Chavez, Julissa Mota, Jasmine Gaona, Brian Cabrera
   3. Follow the prompt on screen to enter 5 test scores via the keyboard
     a. You can submit an empty line to terminate the program early
   4. After entering the 5th valid score, the program will output the following:
+  
     a. the highest score
     b. the lowest score
     c. the average score
